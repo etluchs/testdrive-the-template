@@ -48,7 +48,19 @@ def test_the_signed_in_user_is_shown(signed_in_client):
     assert "Amelia Stucki" in body
 
 
-def test_the_summary_form_is_prefilled_with_the_signed_in_address(signed_in_client):
-    body = signed_in_client(email="ben.marti@uzh.ch").get("/").text
+def test_the_app_never_reads_the_easy_auth_headers_itself(signed_in_client):
+    """Identity must come from appkit, which applies whatever APPKIT_AUTH says.
 
-    assert 'value="ben.marti@uzh.ch"' in body
+    Reading ``x-ms-client-principal*`` directly would bypass that: on any request
+    path that does not pass through Easy Auth, a caller can set those headers
+    themselves (AGENTS.md).
+    """
+    app_dir = Path(__file__).parent.parent / "app"
+    for source in app_dir.rglob("*.py"):
+        text = source.read_text(encoding="utf-8")
+        assert "x-ms-client-principal" not in text.lower(), (
+            f"{source.name} reads an Easy Auth header directly; use auth.user(request)"
+        )
+
+    # And the identity appkit resolved does reach the page.
+    assert "Amelia Stucki" in signed_in_client().get("/").text

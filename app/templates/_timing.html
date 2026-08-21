@@ -1,0 +1,189 @@
+{% from "_macros.html" import alert, table, effect_chart, winrate_chart %}
+
+{% if error %}
+  {{ alert(error, kind="error") }}
+{% elif result %}
+  {% if not result.points %}
+    {{ alert(result.notes[0] if result.notes else "No data for that combination.",
+             kind="warning") }}
+  {% else %}
+
+    {{ alert(result.verdict, kind=("success" if result.best else "info"),
+             title="%s on %s" | format(result.item_name, result.hero_name)) }}
+
+    {% if result.enemy_names %}
+      <p class="result__matchup">
+        Against {{ result.enemy_names | join(", ") }}.
+      </p>
+    {% endif %}
+
+    {{ winrate_chart(
+        result.points,
+        caption="Win rate by the minute the item was bought"
+    ) }}
+
+    <p class="result__caveat">
+      The solid line on its own is the misleading one: buying late correlates
+      with winning because a player who can afford the item at minute 30 was
+      usually already ahead. The dashed line is what comparable players did
+      without it, so the <em>gap</em> between the lines — not the height of the
+      solid line — is what the item is worth. The chart below plots that gap
+      directly.
+    </p>
+
+    {{ effect_chart(
+        result.points,
+        caption="Change in win rate by purchase minute (percentage points)",
+        peak_minute=(result.best.minute if result.best else None)
+    ) }}
+
+    {{ table(
+        columns=[
+          {"key": "window",  "label": "Buy window (min)"},
+          {"key": "effect",  "label": "Effect (pp)"},
+          {"key": "ci",      "label": "95% CI"},
+          {"key": "raw",     "label": "Bought it"},
+          {"key": "ref",     "label": "Comparable players"},
+          {"key": "n",       "label": "Purchases"},
+          {"key": "verdict", "label": "Reading"}
+        ],
+        rows=result.rows_for_table,
+        caption="Effect of buying %s on %s, by purchase window" | format(
+            result.item_name, result.hero_name),
+        row_header="window",
+        empty="No window had enough purchases to estimate."
+    ) }}
+
+    {% if key_buys %}
+      <h2>Key buys for this game</h2>
+      <p>
+        The items whose value comes most from <em>this</em> line-up rather than
+        from being strong in general — so an item that merely suits the hero
+        does not crowd out the one that answers the enemy team.
+      </p>
+      {{ table(
+          columns=[
+            {"key": "item",     "label": "Item"},
+            {"key": "slot",     "label": "Tier / slot"},
+            {"key": "target",   "label": "Best window"},
+            {"key": "effect",   "label": "Effect (pp)"},
+            {"key": "matchup",  "label": "Of which matchup (pp)"},
+            {"key": "because",  "label": "Aimed at"}
+          ],
+          rows=key_buys,
+          caption="Highest-value buys for this particular match-up",
+          row_header="item",
+          empty="No item stood out for this line-up specifically.") }}
+    {% endif %}
+
+    {% if plan and plan.steps %}
+      <h2>Suggested build path — {{ plan.strategy_label }}</h2>
+      {{ alert(plan.summary, kind="info") }}
+      <p>
+        {{ plan.steps | length }} items chosen from {{ plan.considered }} with
+        usable data on {{ plan.hero_name }}{% if plan.ally_names %}, alongside
+        {{ plan.ally_names | join(", ") }}{% endif %}{% if plan.enemy_names %},
+        against {{ plan.enemy_names | join(", ") }}{% endif %}.
+        Slots used:
+        {% for slot, count in plan.slot_usage.items() %}
+          {{ slot }} {{ count }}/4{% if not loop.last %}, {% endif %}
+        {% endfor %}.
+      </p>
+
+      {{ table(
+          columns=[
+            {"key": "order",  "label": "#"},
+            {"key": "item",   "label": "Item"},
+            {"key": "slot",   "label": "Tier / slot"},
+            {"key": "cost",   "label": "Souls"},
+            {"key": "target", "label": "Target minute"},
+            {"key": "effect",  "label": "Effect (pp)"},
+            {"key": "ci",      "label": "95% CI"},
+            {"key": "running", "label": "Running win rate (floor–ceiling)"},
+            {"key": "why",     "label": "Timed by"}
+          ],
+          rows=plan.rows_for_table,
+          caption="Suggested purchase order for %s" | format(plan.hero_name),
+          row_header="order") }}
+
+      {{ alert(
+          "These effects are estimated one item at a time against a common
+           reference. They do not add up, and nothing here models one item
+           making another better — so read this as an order and a set of target
+           times, not as a predicted win rate for the finished build.",
+          kind="warning", title="What this plan is not") }}
+
+      <details class="result__detail">
+        <summary>How the order was chosen</summary>
+        <ul>
+          {% for note in plan.notes %}<li>{{ note }}</li>{% endfor %}
+          <li>
+            “Timed by” says what set each target: <em>peak</em> means the item's
+            own best window, <em>souls</em> means it cannot typically be
+            afforded any earlier once everything above it is paid for.
+          </li>
+        </ul>
+      </details>
+    {% endif %}
+
+    {% if comparison %}
+      <h2>Across patches</h2>
+      {{ alert(comparison.verdict,
+               kind=("warning" if comparison.significant and comparison.delta_pp < 0
+                     else ("success" if comparison.significant else "info")),
+               title="%s: %s vs %s" | format(comparison.item_name,
+                                             comparison.before.start,
+                                             comparison.after.start)) }}
+      {{ table(
+          columns=[
+            {"key": "patch",  "label": "Patch"},
+            {"key": "effect", "label": "Effect (pp)"},
+            {"key": "ci",     "label": "95% CI"},
+            {"key": "n",      "label": "Purchases"}
+          ],
+          rows=comparison_rows,
+          caption="%s compared between two patches" | format(comparison.item_name),
+          row_header="patch") }}
+      <p class="result__caveat">
+        Patch figures compare the item against <em>other purchases</em> at the
+        same net worth in the same era, pooled across all heroes. That is a
+        different reference from the timing curve above, which compares against
+        all players on one hero — so the two effect sizes are not interchangeable.
+        A shift in which heroes buy the item can also move this line without the
+        item itself changing.
+      </p>
+    {% endif %}
+
+    {% if trend_rows and trend_rows | length > 2 %}
+      <details class="result__detail">
+        <summary>Every patch in the extract</summary>
+        {{ table(
+            columns=[
+              {"key": "patch",  "label": "Patch"},
+              {"key": "effect", "label": "Effect (pp)"},
+              {"key": "ci",     "label": "95% CI"},
+              {"key": "n",      "label": "Purchases"}
+            ],
+            rows=trend_rows,
+            caption="Effect by patch era, oldest first",
+            row_header="patch") }}
+      </details>
+    {% endif %}
+
+    <details class="result__detail">
+      <summary>What this estimate is based on</summary>
+      <ul>
+        <li>Estimate level: {{ result.level }}.</li>
+        <li>{{ "{:,}".format(result.total_purchases) }} purchases in the extract.</li>
+        {% for note in result.notes %}
+          <li>{{ note }}</li>
+        {% endfor %}
+        <li>
+          “Raw win rate” is what a naive analysis would report. Where it
+          disagrees with the adjusted effect, the gap is the confounding
+          described in <a href="/method">Method</a>.
+        </li>
+      </ul>
+    </details>
+  {% endif %}
+{% endif %}

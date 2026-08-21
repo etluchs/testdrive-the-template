@@ -72,6 +72,10 @@ def test_every_macro_component_is_styled():
         ".alert", ".alert--info", ".alert--success", ".alert--error", ".alert--warning",
         ".nav__list", ".nav__link",
         ".skip-link", ".visually-hidden",
+        ".chart", ".chart__caption", ".chart__svg", ".chart__bg", ".chart__axis",
+        ".chart__scale", ".chart__range",
+        ".chart__line--buy", ".chart__line--ref", ".chart__dot", ".chart__key",
+        ".chart__bar--up", ".chart__bar--down", ".chart__bar--thin", ".chart__ci",
     ):
         assert selector in RULES, f"{selector} is emitted by a macro but never styled"
 

@@ -13,3 +13,8 @@ node_modules/
 
 # OS
 .DS_Store
+
+# Deadlock extracts: generated, large, and reproducible.
+# `python -m etl.build --heroes all` builds the real one (~65 min, rate limited);
+# `python -m etl.devseed` builds a synthetic one offline in seconds.
+data/

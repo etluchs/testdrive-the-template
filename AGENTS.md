@@ -81,23 +81,131 @@ inline the HTML.
 
 ---
 
+## Rules specific to this app
+
+The three above come from the template. These four come from what this app does
+with data, and they matter just as much here.
+
+### 4. The Deadlock API is reached from `etl/`, never from `app/`
+
+This app shows statistics derived from the public Deadlock API. That API is
+**not** an appkit backend and must not become one in `app/`:
+
+- `etl/` is an **offline pipeline**. Every statistic the app shows is computed
+  there, ahead of time, using `urllib` from the standard library.
+- `app/` reads precomputed tables through `appkit.db` — with exactly one
+  exception, `app/live.py`, described below. If you are adding a network call
+  anywhere else in `app/`, stop.
+
+This is not only the golden path, it is forced by the source: `/v1/sql` allows
+**20 requests per hour per IP**. A page that queried it live would be rate
+limited out of service by its second visitor. If a number is missing from the
+app, the fix is to extend `etl/queries.py` and rebuild the seed — never to fetch
+it in a route.
+
+Do not "improve" this by adding a cache in front of a live call. The extract is
+the cache, and it is reviewable, testable and offline.
+
+#### The one granted exception: `app/live.py`
+
+The owner of this app granted a **specific, bounded** exception so the page can
+fill the pickers from the match you are in right now. It applies to
+`app/live.py` and nowhere else. Do not remove it as a rule violation, and do not
+widen it:
+
+- **One endpoint.** `/v1/matches/active` only — public, unauthenticated, no
+  credential sent. **`/v1/sql` must never be called from `app/`**: 20 requests
+  an hour would be exhausted by the second visitor.
+- **Bounded in time.** A short timeout, because a request path must not wait on
+  someone else's outage.
+- **Shared cache.** One fetch serves every visitor for a few seconds. A fetch
+  per click would be abusive of a service that is doing us a favour.
+- **No exception escapes.** Every failure — bad input, account not playing,
+  upstream down — is a rendered sentence. A third party being unavailable is
+  never a 500 here, and `tests/test_livematch.py` pins that.
+
+If you need any *other* live data, that is a new decision for the owner, not an
+extension of this one.
+
+### 5. Statistics that would mislead a player are a bug
+
+The whole point of this app is that the obvious calculation is wrong: purchase
+timing correlates with winning mostly because winning players can afford things.
+`app/logic.py` compares each purchase against a net-worth-matched reference
+population for that reason, and `tests/test_logic.py` pins the behaviour with a
+synthetic item whose raw win rate is 68% and whose true effect is zero.
+
+If you change the estimator, that test must still pass. If you add a new number
+to the UI, say on screen what it is relative to, and keep the confidence
+interval with it — a point estimate alone invites a player to read noise as
+advice.
+
+### 6. Current patch is a filter, not a default
+
+Two things are scoped to the live game, and both are resolved at build time
+rather than hardcoded:
+
+- **Items.** `DeadlockClient.buyable_items()` returns the 156 items currently
+  buyable in the standard shop. It drops 78 removed items (`disabled` /
+  not `shopable`) and 17 Street Brawl exclusives (detected by asset path; the
+  build warns if that disagrees with the tier-5 set rather than silently
+  dropping items).
+  **Components stay in.** Healing Booster builds into Healing Tempo and is also
+  an ordinary tier-2 purchase in its own right. Do not filter items out for
+  being components, and do not cap the picker by name — a `LIMIT 60` ordered by
+  name once cut the list off mid-alphabet and removed exactly the cheap items a
+  player is choosing between early.
+- **Matches.** The extract window starts at the most recent *major* patch from
+  `/v1/patches/big-days`.
+
+If you widen either, you are answering a question about a game that no longer
+exists. The one deliberate exception is `dl_buy_patch`, which reaches back
+across eras precisely so the app can show how an item has changed — it is
+documented as such in `etl/schema.sql`.
+
+Cache filenames under `data/raw/` carry a fingerprint of the patch date and the
+item-set size. Keep it that way: without it, changing either filter silently
+reuses responses computed under the old definition, and nothing looks wrong.
+
+### 7. The two effect numbers are not interchangeable
+
+The timing curve compares an item against **all players on one hero** at the
+same minute and net worth. A patch figure compares it against **all other
+purchases** at the same net worth in the same era, pooled across heroes. They
+have different references and different units of analysis.
+
+Never present one as the other, and never subtract them. Wherever a patch figure
+appears, the differing reference must appear with it — including that an item
+whose own win rate never moved can still show a change when the rest of the shop
+shifts around it.
+
+---
+
 ## How the pieces fit
 
 ```
 app/
   main.py         # routes — thin: input -> logic -> template
-  logic.py        # all business logic; only imports appkit
+  logic.py        # the estimator; only imports appkit
   templates/
     base.html     # page shell: <html lang>, skip link, <main>, nav
-    _macros.html  # the ONLY sanctioned form/table/alert/nav markup
-    index.html    # the example page
-    _summary.html # HTMX partial swapped in after "Send summary"
+    _macros.html  # the ONLY sanctioned form/table/alert/nav markup (+ effect_chart)
+    index.html    # hero / item / enemy-team / patch pickers
+    _items.html   # HTMX partial: item list follows the chosen hero
+    _timing.html  # HTMX partial: verdict, chart, table, patch comparison
+    method.html   # how the numbers are made, and what they do not prove
   static/
     htmx.min.js   # HTMX 2, vendored (no CDN)
     app.css       # UZH corporate design; keep the focus outlines
     uzh_logo.svg  # vendored logo
     fonts/        # Source Sans, vendored (no CDN)
-tests/            # pytest; runs on appkit's fake backend, no network
+etl/              # OFFLINE pipeline; the only code that touches the network
+  deadlock.py     # paced API client (20 requests/hour)
+  queries.py      # the ClickHouse queries, and why they look like that
+  schema.sql      # the tables the app reads
+  build.py        # real extract (slow, rate limited)
+  devseed.py      # synthetic extract (instant, offline) — used by CI and pa11y
+tests/            # pytest; runs on a synthetic extract, no network
 ```
 
 - **HTMX is vendored** in `app/static/`. Do not add a `<script src="https://…">`

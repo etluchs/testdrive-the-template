@@ -1,36 +1,82 @@
 {% extends "base.html" %}
-{% from "_macros.html" import table, field, button %}
+{% from "_macros.html" import select, button, field %}
 
-{% block title %}Requests · UZH{% endblock %}
+{% block title %}Item timing · Deadlock{% endblock %}
 
 {% block content %}
-  <h1>Access &amp; equipment requests</h1>
-  <p class="lead">Open items from the “{{ list_name }}” SharePoint list.</p>
+  <h1>When should I buy it?</h1>
+  <p class="lead">
+    Pick your hero, the item you are considering, and who you are up against.
+    The answer compares players who bought the item against players on the same
+    hero, at the same minute, holding a similar net worth — so it measures the
+    purchase rather than who could already afford it.
+    <a href="/method">How the numbers are made</a>.
+  </p>
 
-  {{ table(
-      columns,
-      rows,
-      caption="Current requests (%d)" | format(summary.total),
-      row_header="Title",
-      empty="There are no requests right now."
-  ) }}
-
-  <h2>Email a summary</h2>
-  <p>Send a status summary of these {{ summary.total }} requests to a colleague.</p>
-
-  <form class="summary-form"
-        method="post" action="/mail-summary"
-        hx-post="/mail-summary" hx-target="#summary-region" hx-swap="innerHTML">
-    {{ field(
-        "recipient", "Recipient email",
-        type="email", required=true,
-        value=(user.email if user else ""),
-        autocomplete="email",
-        help="We’ll email the summary shown above to this address."
-    ) }}
-    {{ button("Send summary", type="submit", variant="primary") }}
+  <form class="live-lookup" hx-get="/live" hx-target="#lineup-region"
+        hx-swap="innerHTML" hx-indicator=".live-lookup .btn">
+    {{ field("account_id", "Steam account id",
+             help="Optional. Fills the pickers below from the match you are in
+                   right now. Reads the public live-match list and filters it by
+                   this id — it does not read your game or your Steam session.",
+             inputmode="numeric", autocomplete="off") }}
+    {{ button("Find my match", type="submit", variant="secondary") }}
   </form>
 
-  {# HTMX drops the result here; the injected alert's role announces it. #}
-  <div id="summary-region"></div>
+  <div id="live-status" aria-live="polite"></div>
+
+  <form class="timing-form" method="post" action="/timing"
+        hx-post="/timing" hx-target="#timing-region" hx-swap="innerHTML">
+
+    <div id="lineup-region">
+      {% include "_lineup.html" %}
+    </div>
+
+    {{ select("build_strategy", "Build path", strategy_options,
+              help="Different answers to “which items”, not re-sorts of one answer.") }}
+
+    {% if patch_options | length > 1 %}
+      <fieldset class="timing-form__patches">
+        <legend>Compare two patches (optional)</legend>
+        <p class="field__help" id="patch-help">
+          Deadlock ships dated updates rather than version numbers, so eras are
+          named by the day they started. Leave both blank to skip the comparison.
+        </p>
+        <div class="timing-form__row">
+          {{ select("patch_before", "Earlier patch",
+                    [{"value": "", "label": "— none —"}] + patch_options,
+                    aria_describedby="patch-help") }}
+          {{ select("patch_after", "Later patch",
+                    [{"value": "", "label": "— none —"}] + patch_options,
+                    aria_describedby="patch-help") }}
+        </div>
+      </fieldset>
+    {% endif %}
+
+    {{ button("Show timing", type="submit", variant="primary") }}
+  </form>
+
+  {% if presets %}
+    <h2>Most-played enemy teams</h2>
+    <p>
+      The ten most common compositions in the extract, out of the 10,000 stored.
+      Even the most-played one occurs too rarely to carry its own timing curve —
+      see <a href="/method">Method</a> for what that means.
+    </p>
+    <ul class="preset-list">
+      {% for preset in presets %}
+        <li class="preset-list__item">
+          <span class="preset-list__rank">#{{ preset.rank }}</span>
+          {{ preset.label }}
+          <span class="preset-list__n">{{ "{:,}".format(preset.n) }} games</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {#- HTMX drops the result here. The region is marked live because the content
+      arrives long after the page has settled: a role="status" element that is
+      *inserted* into a quiet page is announced inconsistently, whereas a change
+      inside an existing live region is not. -#}
+  <div id="timing-region" aria-live="polite" tabindex="-1"></div>
 {% endblock %}

@@ -1,0 +1,17 @@
+{% from "_macros.html" import select %}
+{#- Tier first, then the items in it.
+
+    Both selects are swapped together by HTMX so the two can never disagree:
+    changing the hero re-renders the tier list as well, and cannot leave a tier
+    selected that the new hero has no items for. -#}
+{% if tiers %}
+  {{ select("item_tier", "Item tier", tiers, value=tier, required=true,
+            help="Pick the tier you are shopping in, then the item.",
+            hx_get="/items", hx_target="#item-region", hx_swap="innerHTML",
+            hx_include="[name='hero_id']", hx_trigger="change") }}
+{% endif %}
+{% if items %}
+  {{ select("item_id", "Item", items, required=true) }}
+{% else %}
+  {{ select("item_id", "Item", [{"value": "", "label": "— no data for this tier —"}]) }}
+{% endif %}

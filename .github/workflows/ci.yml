@@ -49,6 +49,12 @@ jobs:
         with:
           node-version: "22"
 
+      # The real extract takes ~65 minutes because the upstream API allows 20
+      # requests per hour, so CI builds the synthetic one instead: same shape,
+      # same code path, deterministic, and no network.
+      - name: Build a synthetic extract for the app to serve
+        run: uv run python -m etl.devseed
+
       - name: Start example app
         env:
           APPKIT_BACKEND: fake
