@@ -1,21 +1,46 @@
 {
   "defaults": {
     "standard": "WCAG2AA",
-    "runners": ["axe", "htmlcs"],
+    "runners": [
+      "axe",
+      "htmlcs"
+    ],
     "timeout": 60000,
     "wait": 500,
     "chromeLaunchConfig": {
-      "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+      "args": [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage"
+      ]
     }
   },
   "urls": [
     "http://localhost:8080/",
+    "http://localhost:8080/method",
     {
       "url": "http://localhost:8080/",
       "actions": [
-        "set field #recipient to summary-test@uzh.ch",
-        "click element .summary-form .btn",
-        "wait for element #summary-region .alert to be visible"
+        "click element .timing-form .btn",
+        "wait for element #timing-region .alert to be visible"
+      ]
+    },
+    {
+      "url": "http://localhost:8080/",
+      "actions": [
+        "set field #patch_before to 8",
+        "set field #patch_after to 9",
+        "click element .timing-form .btn",
+        "wait for element #timing-region .alert to be visible"
+      ]
+    },
+    {
+      "url": "http://localhost:8080/",
+      "actions": [
+        "set field #item_tier to 4",
+        "wait for element #item_id to be visible",
+        "click element .timing-form .btn",
+        "wait for element #timing-region .alert to be visible"
       ]
     }
   ]

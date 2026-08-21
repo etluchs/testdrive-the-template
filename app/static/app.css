@@ -315,3 +315,142 @@ mark {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ── Item-timing app ──────────────────────────────────────────────────────
+   Components this app adds on top of the CD. Colours come from the palette
+   above rather than fresh hex codes, and nothing carries meaning by colour
+   alone: the chart pairs direction with position, and every value in it is
+   repeated in the table beneath. */
+
+.timing-form__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter);
+  align-items: flex-end;
+}
+.timing-form__row > * { flex: 1 1 12rem; min-width: 0; }
+/* The tier and item selects are swapped together by HTMX, so they share a
+   wrapper — `display: contents` lets them still sit in the row alongside the
+   hero select instead of stacking inside it. */
+.timing-form__pickers { display: contents; }
+
+.timing-form__enemies {
+  border: 1px solid rgba(var(--c-grey-medium), 1);
+  padding: var(--gutter);
+  margin: var(--gutter) 0;
+}
+.timing-form__enemies legend {
+  font-weight: 600;
+  padding: 0 .4em;
+}
+
+.timing-form__patches {
+  border: 1px solid rgba(var(--c-grey-medium), 1);
+  padding: var(--gutter);
+  margin: var(--gutter) 0;
+}
+.timing-form__patches legend { font-weight: 600; padding: 0 .4em; }
+
+.result__caveat {
+  border-left: 4px solid rgba(var(--c-grey-medium), 1);
+  padding-left: var(--gutter);
+  color: rgba(var(--c-text-black), 1);
+}
+
+.preset-list { list-style: none; padding: 0; }
+.preset-list__item {
+  padding: .35rem 0;
+  border-bottom: 1px solid rgba(var(--c-grey-medium), 1);
+}
+.preset-list__rank {
+  font-variant-numeric: tabular-nums;
+  color: rgba(var(--c-text-grey), 1);
+  margin-right: .5em;
+}
+.preset-list__n {
+  color: rgba(var(--c-text-grey), 1);
+  font-size: .9em;
+  margin-left: .5em;
+}
+
+.chart { margin: var(--gutter) 0; }
+.chart__caption {
+  font-weight: 600;
+  margin-bottom: .5rem;
+}
+.chart__svg {
+  width: 100%;
+  height: auto;
+  max-height: 260px;
+  background: rgba(var(--c-grey-light), 1);
+  border: 1px solid rgba(var(--c-grey-medium), 1);
+}
+.chart__axis { stroke: rgba(var(--c-text-black), 1); stroke-width: 1; }
+.chart__bg { fill: rgba(var(--c-grey-light), 1); }
+/* The axis labels are HTML, not SVG text — see the note in _macros.html. */
+.chart__scale {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: .35rem 0 0;
+  font-size: .95rem;
+  color: rgba(var(--c-text-black), 1);
+}
+/* Deliberately empty and drawn with a border rather than an arrow glyph. As
+   text it was reported as an unresolvable-contrast failure even in near-black,
+   and it carries no information the two end labels do not already give. */
+.chart__scale-mid {
+  flex: 1 1 auto;
+  align-self: center;
+  margin: 0 .6rem;
+  border-bottom: 1px dotted rgba(var(--c-grey), 1);
+}
+.chart__range {
+  margin: .15rem 0 0;
+  font-size: .95rem;
+  color: rgba(var(--c-text-black), 1);
+}
+/* Gains are UZH blue and sit above the line; losses are the CD's red and sit
+   below it. Position carries the meaning; colour only reinforces it. */
+.chart__bar--up { fill: rgba(var(--c-blue), .85); }
+.chart__bar--down { fill: rgba(var(--c-err-ink), .85); }
+/* A window with too few purchases is drawn hollow, and labelled as such in
+   the table — it is not merely a paler shade of the same claim. */
+.chart__bar--thin { fill: rgba(var(--c-white), 1); stroke: rgba(var(--c-text-grey), 1); }
+.chart__bar--peak { stroke: rgba(var(--c-black), 1); stroke-width: 2; }
+.chart__ci { stroke: rgba(var(--c-black), .65); stroke-width: 1.5; }
+
+.result__matchup { font-weight: 600; }
+.result__detail { margin: var(--gutter) 0; }
+.result__detail summary { cursor: pointer; font-weight: 600; }
+.result__detail summary:focus-visible { outline: 3px solid rgba(var(--c-blue), 1); }
+
+.formula {
+  background: rgba(var(--c-blue-light), 1);
+  border-left: 4px solid rgba(var(--c-blue), 1);
+  padding: .75rem var(--gutter);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Win-rate-over-time chart. The two series differ by dash pattern as well as
+   colour, and both are named in the text key below the chart, so the pair is
+   still readable without colour vision. */
+.chart__axis--even { stroke-dasharray: 4 4; }
+.chart__line { fill: none; stroke-width: 2.5; }
+.chart__line--buy { stroke: rgba(var(--c-blue), 1); }
+.chart__line--ref { stroke: rgba(var(--c-text-grey), 1); stroke-dasharray: 7 5; }
+.chart__dot { fill: rgba(var(--c-blue), 1); }
+/* A window with too few purchases is hollow here as well. */
+.chart__dot--thin { fill: rgba(var(--c-white), 1); stroke: rgba(var(--c-blue), 1); }
+.chart__key { display: inline-block; margin-left: .75rem; }
+.chart__key--buy::before,
+.chart__key--ref::before {
+  content: "";
+  display: inline-block;
+  width: 1.6em;
+  vertical-align: middle;
+  margin-right: .35em;
+  border-top-width: 3px;
+}
+.chart__key--buy::before { border-top-style: solid; border-top-color: rgba(var(--c-blue), 1); }
+.chart__key--ref::before { border-top-style: dashed; border-top-color: rgba(var(--c-text-grey), 1); }

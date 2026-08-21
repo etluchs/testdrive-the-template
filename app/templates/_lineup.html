@@ -1,0 +1,47 @@
+{% from "_macros.html" import select, alert %}
+{%- if live_note %}
+  {#- Rendered inside the swapped block so it is announced with the result of
+      the lookup rather than arriving separately. -#}
+  {{ alert(live_note, kind="info") }}
+{%- endif %}
+{#- Hero, item and both teams. Swapped as one block so "find my match" can fill
+    every picker at once, and so the item list can never be left describing a
+    hero that is no longer selected. -#}
+<div class="timing-form__row">
+  {{ select("hero_id", "Your hero", heroes, value=hero, required=true,
+            hx_get="/items", hx_target="#item-region", hx_swap="innerHTML",
+            hx_include="[name='item_tier']", hx_trigger="change") }}
+  <div id="item-region" class="timing-form__pickers">
+    {% include "_items.html" %}
+  </div>
+</div>
+
+<fieldset class="timing-form__enemies">
+  <legend>Your team</legend>
+  <p class="field__help" id="ally-help">
+    Your five team-mates, not counting you. Used to adjust the build order.
+  </p>
+  <div class="timing-form__row">
+    {% for slot in range(1, 6) %}
+      {{ select("ally", "Team-mate %d" | format(slot), ally_options,
+                value=ally_values[slot - 1],
+                id="ally%d" | format(slot), aria_describedby="ally-help") }}
+    {% endfor %}
+  </div>
+</fieldset>
+
+<fieldset class="timing-form__enemies">
+  <legend>Enemy team</legend>
+  <p class="field__help" id="enemy-help">
+    Up to six heroes. Leave blank for the general answer on this hero.
+  </p>
+  <div class="timing-form__row">
+    {#- All six post under the same name so they arrive as a list; each still
+        needs its own id, or the labels all point at the first. -#}
+    {% for slot in range(1, 7) %}
+      {{ select("enemy", "Enemy %d" | format(slot), enemy_options,
+                value=enemy_values[slot - 1],
+                id="enemy%d" | format(slot), aria_describedby="enemy-help") }}
+    {% endfor %}
+  </div>
+</fieldset>

@@ -16,16 +16,19 @@
 #}
 
 {#-- text-like input with a real <label>, help text, and accessible errors --#}
-{% macro field(name, label, value="", type="text", required=false, help="", error="", placeholder="", autocomplete="") %}
+{% macro field(name, label, value="", type="text", required=false, help="", error="", placeholder="", autocomplete="", id="") %}
+  {#- Several controls may legitimately share a `name` (they post as a list);
+      `id` must still be unique, so it defaults to `name` and can be overridden. -#}
+  {%- set id = id or name -%}
   {%- set ids = [] -%}
-  {%- if help %}{% set _ = ids.append(name ~ "-help") %}{% endif -%}
-  {%- if error %}{% set _ = ids.append(name ~ "-error") %}{% endif -%}
+  {%- if help %}{% set _ = ids.append(id ~ "-help") %}{% endif -%}
+  {%- if error %}{% set _ = ids.append(id ~ "-error") %}{% endif -%}
   <div class="field{% if error %} field--error{% endif %}">
-    <label class="field__label" for="{{ name }}">
+    <label class="field__label" for="{{ id }}">
       {{ label }}{% if required %} <span class="field__req" aria-hidden="true">*</span><span class="visually-hidden"> (required)</span>{% endif %}
     </label>
-    {%- if help %}<p class="field__help" id="{{ name }}-help">{{ help }}</p>{% endif %}
-    <input class="field__input" id="{{ name }}" name="{{ name }}" type="{{ type }}"
+    {%- if help %}<p class="field__help" id="{{ id }}-help">{{ help }}</p>{% endif %}
+    <input class="field__input" id="{{ id }}" name="{{ name }}" type="{{ type }}"
            value="{{ value }}"
            {%- if placeholder %} placeholder="{{ placeholder }}"{% endif %}
            {%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
@@ -33,21 +36,22 @@
            {%- if error %} aria-invalid="true"{% endif %}
            {%- if ids %} aria-describedby="{{ ids | join(' ') }}"{% endif %}
            {%- for key, val in kwargs.items() %} {{ key | replace('_', '-') }}="{{ val }}"{% endfor %}>
-    {%- if error %}<p class="field__error" id="{{ name }}-error" role="alert">{{ error }}</p>{% endif %}
+    {%- if error %}<p class="field__error" id="{{ id }}-error" role="alert">{{ error }}</p>{% endif %}
   </div>
 {% endmacro %}
 
 {#-- labelled <select> --#}
-{% macro select(name, label, options, value="", required=false, help="", error="") %}
+{% macro select(name, label, options, value="", required=false, help="", error="", id="") %}
+  {%- set id = id or name -%}
   {%- set ids = [] -%}
-  {%- if help %}{% set _ = ids.append(name ~ "-help") %}{% endif -%}
-  {%- if error %}{% set _ = ids.append(name ~ "-error") %}{% endif -%}
+  {%- if help %}{% set _ = ids.append(id ~ "-help") %}{% endif -%}
+  {%- if error %}{% set _ = ids.append(id ~ "-error") %}{% endif -%}
   <div class="field{% if error %} field--error{% endif %}">
-    <label class="field__label" for="{{ name }}">
+    <label class="field__label" for="{{ id }}">
       {{ label }}{% if required %} <span class="field__req" aria-hidden="true">*</span><span class="visually-hidden"> (required)</span>{% endif %}
     </label>
-    {%- if help %}<p class="field__help" id="{{ name }}-help">{{ help }}</p>{% endif %}
-    <select class="field__input" id="{{ name }}" name="{{ name }}"
+    {%- if help %}<p class="field__help" id="{{ id }}-help">{{ help }}</p>{% endif %}
+    <select class="field__input" id="{{ id }}" name="{{ name }}"
             {%- if required %} required aria-required="true"{% endif %}
             {%- if error %} aria-invalid="true"{% endif %}
             {%- if ids %} aria-describedby="{{ ids | join(' ') }}"{% endif %}
@@ -58,7 +62,7 @@
         <option value="{{ ovalue }}"{% if ovalue == value %} selected{% endif %}>{{ olabel }}</option>
       {%- endfor %}
     </select>
-    {%- if error %}<p class="field__error" id="{{ name }}-error" role="alert">{{ error }}</p>{% endif %}
+    {%- if error %}<p class="field__error" id="{{ id }}-error" role="alert">{{ error }}</p>{% endif %}
   </div>
 {% endmacro %}
 
@@ -104,7 +108,9 @@
 
 {#-- status / error banner; meaning is carried by text, not colour alone --#}
 {% macro alert(message, kind="info", title="") %}
-  {%- set role = "alert" if kind in ("error", "warning") else "status" -%}
+  {#- Only an error interrupts. A warning is context the reader should have,
+      not something that should preempt the result being swapped in beside it. -#}
+  {%- set role = "alert" if kind == "error" else "status" -%}
   {%- set prefixes = {"success": "Success", "error": "Error", "warning": "Warning", "info": "Information"} -%}
   <div class="alert alert--{{ kind }}" role="{{ role }}">
     <span class="alert__icon" aria-hidden="true"></span>
@@ -114,6 +120,162 @@
       <p class="alert__message">{{ message }}</p>
     </div>
   </div>
+{% endmacro %}
+
+{#--
+  Effect-over-time chart.
+
+  A chart is not an accessible medium on its own, so this macro emits three
+  things: an <svg role="img"> with a text alternative, a visually hidden
+  narrative summary, and — from the caller — the same numbers in a real table.
+  Meaning never rests on colour alone: bars above and below the zero line differ
+  in position, and the table carries the signs.
+
+  points: objects with .minute, .label, .effect_pp, .ci_low_pp, .ci_high_pp,
+          .significant and .low_confidence
+--#}
+{% macro effect_chart(points, caption="", peak_minute=None) %}
+  {%- set width = 720 -%}
+  {%- set height = 210 -%}
+  {%- set pad_l = 4 -%}
+  {%- set pad_b = 6 -%}
+  {%- set pad_t = 6 -%}
+  {%- set lows = points | map(attribute="ci_low_pp") | list -%}
+  {%- set highs = points | map(attribute="ci_high_pp") | list -%}
+  {%- set lo = [ (lows | min), 0 ] | min -%}
+  {%- set hi = [ (highs | max), 0 ] | max -%}
+  {%- set span = (hi - lo) if (hi - lo) > 0.001 else 1 -%}
+  {%- set plot_h = height - pad_b - pad_t -%}
+  {%- set plot_w = width - pad_l - 8 -%}
+  {%- set step = plot_w / (points | length) -%}
+  {%- set zero_y = pad_t + plot_h * (hi / span) -%}
+  <figure class="chart">
+    {%- if caption %}<figcaption class="chart__caption">{{ caption }}</figcaption>{% endif %}
+    <svg class="chart__svg" viewBox="0 0 {{ width }} {{ height }}"
+         role="img" aria-labelledby="chart-title" aria-describedby="chart-desc" preserveAspectRatio="xMidYMid meet">
+      <title id="chart-title">{{ caption or "Effect on win rate by purchase minute" }}</title>
+      <desc id="chart-desc">
+        Change in win rate, in percentage points, for each two-minute purchase
+        window from minute {{ points[0].minute }} to
+        minute {{ points[-1].minute }}. Bars above the zero line are gains,
+        bars below are losses. Thin vertical lines are 95% confidence intervals.
+      </desc>
+
+      {#- An explicit painted background, not just a CSS background on the
+          <svg>: contrast checkers resolve the colour behind SVG text by
+          looking for a painted ancestor, and a CSS background on the root
+          element is not one. Without this the tick labels are reported as
+          unknown-contrast failures. -#}
+      <rect class="chart__bg" x="0" y="0" width="{{ width }}" height="{{ height }}"/>
+
+      {#- zero baseline -#}
+      <line x1="{{ pad_l }}" y1="{{ zero_y }}" x2="{{ width - 8 }}" y2="{{ zero_y }}"
+            class="chart__axis"/>
+      {%- for p in points %}
+        {%- set x = pad_l + step * loop.index0 + step * 0.5 -%}
+        {%- set y_eff = pad_t + plot_h * ((hi - p.effect_pp) / span) -%}
+        {%- set y_lo = pad_t + plot_h * ((hi - p.ci_low_pp) / span) -%}
+        {%- set y_hi = pad_t + plot_h * ((hi - p.ci_high_pp) / span) -%}
+        {%- set cls = "chart__bar--up" if p.effect_pp >= 0 else "chart__bar--down" -%}
+        {%- set peak = (peak_minute is not none and p.minute == peak_minute) -%}
+        <rect class="chart__bar {{ cls }}{% if p.low_confidence %} chart__bar--thin{% endif %}
+                     {% if peak %} chart__bar--peak{% endif %}"
+              x="{{ x - step * 0.3 }}" width="{{ step * 0.6 }}"
+              y="{{ [y_eff, zero_y] | min }}"
+              height="{{ [ (y_eff - zero_y) | abs, 1 ] | max }}"/>
+        <line class="chart__ci" x1="{{ x }}" x2="{{ x }}" y1="{{ y_lo }}" y2="{{ y_hi }}"/>
+      {%- endfor %}
+    </svg>
+    {#- The axis is real HTML, not SVG <text>. Text inside an SVG cannot be
+        resized by a reader's font settings, and contrast checkers cannot
+        resolve what is painted behind it — axe reports every such label as a
+        contrast failure even at 17:1. Out here it is ordinary text. Exact
+        values live in the table this macro is always paired with, so the axis
+        only has to convey the direction and range. -#}
+    <p class="chart__scale">
+      <span>Purchase minute {{ points[0].minute }}</span>
+      <span class="chart__scale-mid" aria-hidden="true"></span>
+      <span>{{ points[-1].minute }}</span>
+    </p>
+    <p class="chart__range">
+      Vertical scale {{ "%+.0f" | format(lo) }} to {{ "%+.0f" | format(hi) }}
+      percentage points; the horizontal line is no change.
+    </p>
+  </figure>
+{% endmacro %}
+
+{#--
+  Win rate against purchase time.
+
+  Two series, and the second one is the point: `raw_winrate` is how players who
+  bought the item in that window actually did, and `ref_winrate` is how
+  comparable players — same hero, same minute, same net worth — did without it.
+  The first line alone is the confounded picture that makes every expensive item
+  look good late. The vertical gap between the lines is the adjusted effect, so
+  showing them together makes the confounding visible instead of hiding it.
+
+  Same accessibility construction as `effect_chart`: no <text> inside the SVG,
+  axis labels in real HTML below, and every value repeated in the table.
+--#}
+{% macro winrate_chart(points, caption="") %}
+  {%- set width = 720 -%}
+  {%- set height = 210 -%}
+  {%- set pad_l = 4 -%}
+  {%- set pad_t = 6 -%}
+  {%- set pad_b = 6 -%}
+  {%- set rates = (points | map(attribute="raw_winrate") | list)
+                + (points | map(attribute="ref_winrate") | list) -%}
+  {%- set lo = [ (rates | min) - 0.03, 0 ] | max -%}
+  {%- set hi = [ (rates | max) + 0.03, 1 ] | min -%}
+  {%- set span = (hi - lo) if (hi - lo) > 0.001 else 1 -%}
+  {%- set plot_h = height - pad_b - pad_t -%}
+  {%- set plot_w = width - pad_l - 8 -%}
+  {%- set step = plot_w / (points | length) -%}
+  {%- macro y(v) %}{{ pad_t + plot_h * ((hi - v) / span) }}{% endmacro -%}
+  <figure class="chart">
+    {%- if caption %}<figcaption class="chart__caption">{{ caption }}</figcaption>{% endif %}
+    <svg class="chart__svg" viewBox="0 0 {{ width }} {{ height }}"
+         role="img" aria-labelledby="wr-title" aria-describedby="wr-desc" preserveAspectRatio="xMidYMid meet">
+      <title id="wr-title">{{ caption or "Win rate by purchase minute" }}</title>
+      <desc id="wr-desc">
+        Two lines from minute {{ points[0].minute }} to minute
+        {{ points[-1].minute }}. The solid line is the win rate of players who
+        bought the item in that window. The dashed line is the win rate of
+        comparable players — same hero, same minute, similar net worth — who did
+        not. The distance between them is the item's estimated effect.
+      </desc>
+      <rect class="chart__bg" x="0" y="0" width="{{ width }}" height="{{ height }}"/>
+      {%- if lo < 0.5 and hi > 0.5 %}
+        <line class="chart__axis chart__axis--even"
+              x1="{{ pad_l }}" y1="{{ y(0.5) }}" x2="{{ width - 8 }}" y2="{{ y(0.5) }}"/>
+      {%- endif %}
+      {%- set ref_pts = [] -%}
+      {%- set buy_pts = [] -%}
+      {%- for p in points -%}
+        {%- set x = pad_l + step * loop.index0 + step * 0.5 -%}
+        {%- set _ = ref_pts.append("%s,%s" | format(x, y(p.ref_winrate))) -%}
+        {%- set _ = buy_pts.append("%s,%s" | format(x, y(p.raw_winrate))) -%}
+      {%- endfor -%}
+      <polyline class="chart__line chart__line--ref" points="{{ ref_pts | join(' ') }}"/>
+      <polyline class="chart__line chart__line--buy" points="{{ buy_pts | join(' ') }}"/>
+      {%- for p in points %}
+        {%- set x = pad_l + step * loop.index0 + step * 0.5 -%}
+        <circle class="chart__dot{% if p.low_confidence %} chart__dot--thin{% endif %}"
+                cx="{{ x }}" cy="{{ y(p.raw_winrate) }}" r="3"/>
+      {%- endfor %}
+    </svg>
+    <p class="chart__scale">
+      <span>Purchase minute {{ points[0].minute }}</span>
+      <span class="chart__scale-mid" aria-hidden="true"></span>
+      <span>{{ points[-1].minute }}</span>
+    </p>
+    <p class="chart__range">
+      Vertical scale {{ "%.0f" | format(lo * 100) }}% to
+      {{ "%.0f" | format(hi * 100) }}% win rate.
+      <span class="chart__key chart__key--buy">Solid: bought the item.</span>
+      <span class="chart__key chart__key--ref">Dashed: comparable players who did not.</span>
+    </p>
+  </figure>
 {% endmacro %}
 
 {#-- primary navigation; marks the current page for assistive tech --#}
