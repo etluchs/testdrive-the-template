@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_macros.html" import table, field, button %}
+
+{% block title %}Requests · UZH{% endblock %}
+
+{% block content %}
+  <h1>Access &amp; equipment requests</h1>
+  <p class="lead">Open items from the “{{ list_name }}” SharePoint list.</p>
+
+  {{ table(
+      columns,
+      rows,
+      caption="Current requests (%d)" | format(summary.total),
+      row_header="Title",
+      empty="There are no requests right now."
+  ) }}
+
+  <h2>Email a summary</h2>
+  <p>Send a status summary of these {{ summary.total }} requests to a colleague.</p>
+
+  <form class="summary-form"
+        method="post" action="/mail-summary"
+        hx-post="/mail-summary" hx-target="#summary-region" hx-swap="innerHTML">
+    {{ field(
+        "recipient", "Recipient email",
+        type="email", required=true,
+        value=(user.email if user else ""),
+        autocomplete="email",
+        help="We’ll email the summary shown above to this address."
+    ) }}
+    {{ button("Send summary", type="submit", variant="primary") }}
+  </form>
+
+  {# HTMX drops the result here; the injected alert's role announces it. #}
+  <div id="summary-region"></div>
+{% endblock %}

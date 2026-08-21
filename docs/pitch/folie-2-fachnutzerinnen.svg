@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'Source Sans Pro','Source Sans 3','Helvetica Neue',Arial,Helvetica,sans-serif">
+  <title>Für Fachnutzerinnen und Fachnutzer</title>
+  <rect width="1920" height="1080" fill="#FFFFFF"/>
+  <rect x="0" y="0" width="1920" height="10" fill="#0028A5"/>
+
+  <text x="100" y="118" font-size="24" font-weight="600" letter-spacing="2.5" fill="#666666">FÜR FACHNUTZERINNEN UND FACHNUTZER</text>
+  <text x="100" y="212" font-size="68" font-weight="600" fill="#0028A5">Du beschreibst die Fachsache</text>
+  <text x="100" y="276" font-size="31" fill="#121212">Die App entsteht daraus — mit KI-Assistenz, die auf dem vorgezeichneten Weg bleibt.</text>
+
+  <!-- Spalte 1 -->
+  <rect x="100" y="356" width="520" height="600" rx="10" fill="#F5F5FB"/>
+  <text x="136" y="422" font-size="23" font-weight="600" letter-spacing="2" fill="#0028A5">WAS DU ERREICHST</text>
+  <g font-size="26" fill="#121212">
+    <rect x="136" y="485" width="9" height="9" fill="#0028A5"/>
+    <text x="162" y="496">Eine Web-App im UZH-Design,<tspan x="162" dy="33">zweisprachig und mobil</tspan></text>
+    <rect x="136" y="577" width="9" height="9" fill="#0028A5"/>
+    <text x="162" y="588">Deine SharePoint-Liste direkt im<tspan x="162" dy="33">Web — ohne Export-Ping-Pong</tspan></text>
+    <rect x="136" y="669" width="9" height="9" fill="#0028A5"/>
+    <text x="162" y="680">Eine Suche, die auch findet,<tspan x="162" dy="33">was anders formuliert ist</tspan></text>
+    <rect x="136" y="761" width="9" height="9" fill="#0028A5"/>
+    <text x="162" y="772">Jede Seite verlinkbar und<tspan x="162" dy="33">barrierefrei bedienbar</tspan></text>
+    <rect x="136" y="853" width="9" height="9" fill="#0028A5"/>
+    <text x="162" y="864">Das Beispiel dazu existiert:<tspan x="162" dy="33">der neue Servicekatalog</tspan></text>
+  </g>
+
+  <!-- Spalte 2 -->
+  <rect x="700" y="356" width="520" height="600" rx="10" fill="#F5F5FB"/>
+  <text x="736" y="422" font-size="23" font-weight="600" letter-spacing="2" fill="#0028A5">WAS DU BEITRÄGST</text>
+  <g font-size="26" fill="#121212">
+    <rect x="736" y="485" width="9" height="9" fill="#0028A5"/>
+    <text x="762" y="496">Fachwissen: was die App können<tspan x="762" dy="33">muss und für wen</tspan></text>
+    <rect x="736" y="577" width="9" height="9" fill="#0028A5"/>
+    <text x="762" y="588">Die Datenquelle: SharePoint-Liste<tspan x="762" dy="33">samt ihren Spalten</tspan></text>
+    <rect x="736" y="669" width="9" height="9" fill="#0028A5"/>
+    <text x="762" y="680">Echte Beispiele: Suchbegriffe,<tspan x="762" dy="33">Sonderfälle, Ausnahmen</tspan></text>
+    <rect x="736" y="761" width="9" height="9" fill="#0028A5"/>
+    <text x="762" y="772">Rückmeldung im Review: klicken<tspan x="762" dy="33">und sagen, was fehlt</tspan></text>
+    <rect x="736" y="853" width="9" height="9" fill="#0028A5"/>
+    <text x="762" y="864">Kein Code, keine<tspan x="762" dy="33">Architekturentscheide</tspan></text>
+  </g>
+
+  <!-- Spalte 3 -->
+  <rect x="1300" y="356" width="520" height="600" rx="10" fill="#F5F5FB"/>
+  <text x="1336" y="422" font-size="23" font-weight="600" letter-spacing="2" fill="#0028A5">WOMIT DU ARBEITEST</text>
+  <g font-size="26" fill="#121212">
+    <rect x="1336" y="485" width="9" height="9" fill="#0028A5"/>
+    <text x="1362" y="496">GitHub Copilot — die Assistenz,<tspan x="1362" dy="33">die das Template kennt</tspan></text>
+    <rect x="1336" y="577" width="9" height="9" fill="#0028A5"/>
+    <text x="1362" y="588">Das Template: läuft lokal,<tspan x="1362" dy="33">ohne Azure und ohne Netz</tspan></text>
+    <rect x="1336" y="669" width="9" height="9" fill="#0028A5"/>
+    <text x="1362" y="680">Browser: jede Änderung sofort<tspan x="1362" dy="33">anschauen und ausprobieren</tspan></text>
+    <rect x="1336" y="761" width="9" height="9" fill="#0028A5"/>
+    <text x="1362" y="772">GitHub: Versionen, Review,<tspan x="1362" dy="33">automatische Prüfungen</tspan></text>
+    <rect x="1336" y="853" width="9" height="9" fill="#0028A5"/>
+    <text x="1362" y="864">AGENTS.md: das Regelwerk, an<tspan x="1362" dy="33">das sich die Assistenz hält</tspan></text>
+  </g>
+
+  <text x="100" y="1050" font-size="21" fill="#666666">Adate / Appkit — Pitch</text>
+  <text x="1820" y="1050" font-size="21" fill="#666666" text-anchor="end">2 / 6</text>
+</svg>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ title | default("UZH App") }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
+  <script src="{{ url_for('static', path='htmx.min.js') }}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  {% from "_macros.html" import nav %}
+  <header class="site-header">
+    <div class="site-header__inner">
+      {#- The official UZH wordmark, vendored from the 2.10.0 corporate-design
+          release. It is decorative here: the app name sits beside it as text,
+          so giving the image alt text too would have a screen reader announce
+          the same thing twice. -#}
+      <span class="site-header__brand">
+        <img class="site-header__logo" src="{{ url_for('static', path='uzh_logo.svg') }}"
+             alt="" width="154" height="53">
+        <span class="site-header__title">{{ app_name | default("Internal App") }}</span>
+      </span>
+      {{ nav(nav_items | default([]), current=current_path | default(""), label="Main") }}
+      {% if user %}
+        <span class="site-header__user">
+          <span class="visually-hidden">Signed in as </span>{{ user.name }}
+        </span>
+      {% endif %}
+    </div>
+  </header>
+
+  <main id="main" class="main" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <p>Universität Zürich — internal use only.</p>
+  </footer>
+</body>
+</html>

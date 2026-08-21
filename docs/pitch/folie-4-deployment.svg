@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'Source Sans Pro','Source Sans 3','Helvetica Neue',Arial,Helvetica,sans-serif">
+<title>Deployment: zwei Landing Zones, ein Eingang</title>
+<defs><marker id="arw4" viewBox="0 0 12 10" refX="11" refY="5" markerWidth="9" markerHeight="8" orient="auto"><path d="M0 0 L12 5 L0 10 z" fill="#666666"/></marker></defs>
+<rect width="1920" height="1080" fill="#FFFFFF"/>
+<rect x="0" y="0" width="1920" height="10" fill="#0028A5"/>
+<text x="100" y="118" font-size="24" fill="#666666" font-weight="600" letter-spacing="2.5">DEPLOYMENT</text>
+<text x="100" y="212" font-size="68" fill="#0028A5" font-weight="600">Zwei Landing Zones, ein Eingang</text>
+<text x="100" y="276" font-size="31" fill="#121212">Öffentlich erreichbar wird eine App nur über das zentrale Application Gateway — eine eigene öffentliche IP verbietet die Policy.</text>
+<rect x="555" y="320" width="190" height="52" rx="26" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="2"/>
+<text x="650" y="354" font-size="22" fill="#121212" text-anchor="middle">Internet</text>
+<path d="M650 376 V416" stroke="#666666" stroke-width="3" marker-end="url(#arw4)"/>
+<text x="672" y="404" font-size="19" fill="#666666">HTTPS 443</text>
+<rect x="100" y="422" width="1100" height="120" rx="10" fill="#0028A5"/>
+<text x="140" y="466" font-size="26" fill="#FFFFFF" font-weight="600">Connectivity Hub — eigene Subscription</text>
+<rect x="140" y="482" width="220" height="38" rx="19" fill="#FFFFFF" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+<text x="250" y="508" font-size="20" fill="#121212" text-anchor="middle">Application Gateway</text>
+<rect x="370" y="482" width="60" height="38" rx="19" fill="#FFFFFF" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+<text x="400" y="508" font-size="20" fill="#121212" text-anchor="middle">WAF</text>
+<rect x="440" y="482" width="230" height="38" rx="19" fill="#FFFFFF" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+<text x="555" y="508" font-size="20" fill="#121212" text-anchor="middle">scat-test.azr.uzh.ch</text>
+<rect x="680" y="482" width="180" height="38" rx="19" fill="#FFFFFF" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+<text x="770" y="508" font-size="20" fill="#121212" text-anchor="middle">scat.azr.uzh.ch</text>
+<rect x="870" y="482" width="220" height="38" rx="19" fill="#FFFFFF" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+<text x="980" y="508" font-size="20" fill="#121212" text-anchor="middle">internal.azr.uzh.ch</text>
+<path d="M360 546 V586" stroke="#666666" stroke-width="3" marker-end="url(#arw4)"/>
+<path d="M940 546 V586" stroke="#666666" stroke-width="3" marker-end="url(#arw4)"/>
+<text x="378" y="578" font-size="19" fill="#666666">VNet-Peering</text>
+<text x="958" y="578" font-size="19" fill="#666666">VNet-Peering</text>
+<rect x="100" y="590" width="520" height="330" rx="10" fill="#F5F5FB"/>
+<text x="140" y="638" font-size="26" fill="#0028A5" font-weight="600">Landing Zone TEST</text>
+<text x="140" y="666" font-size="20" fill="#666666">eigene Subscription · vended Spoke</text>
+<rect x="140" y="684" width="440" height="124" rx="8" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="2"/>
+<text x="164" y="714" font-size="21" fill="#121212" font-weight="600">cae-scat-test</text>
+<text x="164" y="738" font-size="18" fill="#666666">internes Load-Balancing · Workload Profiles</text>
+<rect x="164" y="750" width="144" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="236" y="775" font-size="19" fill="#121212" text-anchor="middle">ca-scat-test</text>
+<rect x="318" y="750" width="201" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="418" y="775" font-size="19" fill="#121212" text-anchor="middle">caj-scat-test-live</text>
+<rect x="140" y="822" width="163" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="222" y="847" font-size="19" fill="#121212" text-anchor="middle">psql-scat-test</text>
+<rect x="313" y="822" width="144" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="385" y="847" font-size="19" fill="#121212" text-anchor="middle">id-scat-test</text>
+<rect x="140" y="869" width="229" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="254" y="894" font-size="19" fill="#121212" text-anchor="middle">Easy-Auth-Token-Store</text>
+<rect x="379" y="869" width="153" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="456" y="894" font-size="19" fill="#121212" text-anchor="middle">Log Analytics</text>
+<rect x="680" y="590" width="520" height="330" rx="10" fill="#F5F5FB"/>
+<text x="720" y="638" font-size="26" fill="#0028A5" font-weight="600">Landing Zone PROD</text>
+<text x="720" y="666" font-size="20" fill="#666666">eigene Subscription · vended Spoke</text>
+<rect x="720" y="684" width="440" height="124" rx="8" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="2"/>
+<text x="744" y="714" font-size="21" fill="#121212" font-weight="600">cae-scat-prod</text>
+<text x="744" y="738" font-size="18" fill="#666666">internes Load-Balancing · Workload Profiles</text>
+<rect x="744" y="750" width="144" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="816" y="775" font-size="19" fill="#121212" text-anchor="middle">ca-scat-prod</text>
+<rect x="898" y="750" width="201" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="998" y="775" font-size="19" fill="#121212" text-anchor="middle">caj-scat-prod-live</text>
+<rect x="720" y="822" width="163" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="802" y="847" font-size="19" fill="#121212" text-anchor="middle">psql-scat-prod</text>
+<rect x="893" y="822" width="144" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="965" y="847" font-size="19" fill="#121212" text-anchor="middle">id-scat-prod</text>
+<rect x="720" y="869" width="229" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="834" y="894" font-size="19" fill="#121212" text-anchor="middle">Easy-Auth-Token-Store</text>
+<rect x="959" y="869" width="153" height="37" rx="18" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="1.5"/>
+<text x="1036" y="894" font-size="19" fill="#121212" text-anchor="middle">Log Analytics</text>
+<path d="M360 922 V946" stroke="#666666" stroke-width="3" marker-end="url(#arw4)"/>
+<path d="M940 922 V946" stroke="#666666" stroke-width="3" marker-end="url(#arw4)"/>
+<rect x="100" y="950" width="1100" height="74" rx="10" fill="#FFFFFF" stroke="#0028A5" stroke-width="2"/>
+<text x="140" y="979" font-size="22" fill="#0028A5" font-weight="600">Azure OpenAI — eigene Subscription, für Test und Prod dieselbe</text>
+<text x="140" y="1006" font-size="19" fill="#666666">Embeddings für die semantische Suche · Zugriff über Managed Identity · künftig der LLM-Proxy</text>
+<rect x="1300" y="320" width="520" height="704" rx="10" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="2"/>
+<text x="1340" y="376" font-size="23" fill="#0028A5" font-weight="600" letter-spacing="2">WAS DARAUS FOLGT</text>
+<rect x="1340" y="431" width="9" height="9" fill="#0028A5"/>
+<text x="1366" y="442" font-size="27" fill="#121212" font-weight="600">Keine öffentliche IP</text>
+<text x="1366" y="476" font-size="21" fill="#666666">Die Landing Zone verbietet sie per</text>
+<text x="1366" y="504" font-size="21" fill="#666666">Policy — der Weg über das Gateway</text>
+<text x="1366" y="532" font-size="21" fill="#666666">ist nicht bevorzugt, sondern der einzige.</text>
+<rect x="1340" y="585" width="9" height="9" fill="#0028A5"/>
+<text x="1366" y="596" font-size="27" fill="#121212" font-weight="600">Zwei Pull Requests</text>
+<text x="1366" y="630" font-size="21" fill="#666666">Subnetze kommen von Subscription</text>
+<text x="1366" y="658" font-size="21" fill="#666666">Vending, der Ingress-Eintrag von</text>
+<text x="1366" y="686" font-size="21" fill="#666666">Connectivity Management.</text>
+<rect x="1340" y="739" width="9" height="9" fill="#0028A5"/>
+<text x="1366" y="750" font-size="27" fill="#121212" font-weight="600">X-Forwarded-Host</text>
+<text x="1366" y="784" font-size="21" fill="#666666">Ohne den injizierten Header baut Easy</text>
+<text x="1366" y="812" font-size="21" fill="#666666">Auth die Redirect-URI auf den internen</text>
+<text x="1366" y="840" font-size="21" fill="#666666">FQDN — und der Login scheitert.</text>
+<rect x="1340" y="893" width="9" height="9" fill="#0028A5"/>
+<text x="1366" y="904" font-size="27" fill="#121212" font-weight="600">Egress über die Firewall</text>
+<text x="1366" y="938" font-size="21" fill="#666666">Graph, Login und Registry brauchen</text>
+<text x="1366" y="966" font-size="21" fill="#666666">Regeln; sonst kommt die App nicht raus.</text>
+<text x="100" y="1058" font-size="21" fill="#666666">Adate / Appkit — Pitch</text>
+<text x="1820" y="1058" font-size="21" fill="#666666" text-anchor="end">4 / 6</text>
+</svg>

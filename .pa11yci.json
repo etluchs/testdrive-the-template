@@ -1,0 +1,22 @@
+{
+  "defaults": {
+    "standard": "WCAG2AA",
+    "runners": ["axe", "htmlcs"],
+    "timeout": 60000,
+    "wait": 500,
+    "chromeLaunchConfig": {
+      "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+    }
+  },
+  "urls": [
+    "http://localhost:8080/",
+    {
+      "url": "http://localhost:8080/",
+      "actions": [
+        "set field #recipient to summary-test@uzh.ch",
+        "click element .summary-form .btn",
+        "wait for element #summary-region .alert to be visible"
+      ]
+    }
+  ]
+}

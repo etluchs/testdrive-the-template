@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'Source Sans Pro','Source Sans 3','Helvetica Neue',Arial,Helvetica,sans-serif">
+  <title>Validiert, nicht behauptet</title>
+  <rect width="1920" height="1080" fill="#FFFFFF"/>
+  <rect x="0" y="0" width="1920" height="10" fill="#0028A5"/>
+
+  <text x="100" y="118" font-size="24" font-weight="600" letter-spacing="2.5" fill="#666666">BELEG UND NÄCHSTE SCHRITTE</text>
+  <text x="100" y="212" font-size="68" font-weight="600" fill="#0028A5">Validiert, nicht behauptet</text>
+  <text x="100" y="276" font-size="31" fill="#121212">Der Servicekatalog wurde auf dem Template neu gebaut. Die Suchqualität ist gemessen, nicht geschätzt.</text>
+
+  <!-- Chart-Karte -->
+  <rect x="100" y="340" width="1000" height="530" rx="10" fill="#F5F5FB"/>
+  <text x="140" y="402" font-size="23" font-weight="600" letter-spacing="2" fill="#0028A5">TREFFERQUOTE DER SUCHE</text>
+  <text x="140" y="440" font-size="24" fill="#666666">Anteil der Suchanfragen, die den richtigen Service liefern</text>
+
+  <!-- Gruppe: Top-1 -->
+  <text x="140" y="516" font-size="22" font-weight="600" letter-spacing="1.5" fill="#666666">AN ERSTER STELLE</text>
+  <text x="140" y="562" font-size="25" fill="#121212">nur lexikalisch</text>
+  <rect x="400" y="532" width="402" height="42" rx="4" fill="#6478C9"/>
+  <text x="816" y="562" font-size="26" font-weight="600" fill="#121212">67 %</text>
+  <text x="140" y="618" font-size="25" fill="#121212">+ semantische Suche</text>
+  <rect x="400" y="588" width="498" height="42" rx="4" fill="#0028A5"/>
+  <text x="912" y="618" font-size="26" font-weight="600" fill="#121212">83 %</text>
+
+  <!-- Gruppe: Top-3 -->
+  <text x="140" y="694" font-size="22" font-weight="600" letter-spacing="1.5" fill="#666666">UNTER DEN ERSTEN DREI</text>
+  <text x="140" y="740" font-size="25" fill="#121212">nur lexikalisch</text>
+  <rect x="400" y="710" width="450" height="42" rx="4" fill="#6478C9"/>
+  <text x="864" y="740" font-size="26" font-weight="600" fill="#121212">75 %</text>
+  <text x="140" y="796" font-size="25" fill="#121212">+ semantische Suche</text>
+  <rect x="400" y="766" width="600" height="42" rx="4" fill="#0028A5"/>
+  <text x="1014" y="796" font-size="26" font-weight="600" fill="#121212">100 %</text>
+
+  <text x="140" y="838" font-size="20" fill="#666666">Über alle 112 publizierten Services gemessen. Die semantische Ebene braucht einen</text>
+  <text x="140" y="862" font-size="20" fill="#666666">Azure-OpenAI-Endpunkt; ohne ihn ranken Lexik und Synonyme allein — so laufen alle Tests.</text>
+
+  <!-- Nächste Schritte -->
+  <rect x="1140" y="340" width="680" height="530" rx="10" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="2"/>
+  <text x="1180" y="402" font-size="23" font-weight="600" letter-spacing="2" fill="#0028A5">WIE ES WEITERGEHT</text>
+
+  <rect x="1180" y="459" width="9" height="9" fill="#0028A5"/>
+  <text x="1206" y="470" font-size="28" font-weight="600" fill="#121212">Servicekatalog produktiv setzen</text>
+  <text x="1206" y="504" font-size="24" fill="#666666">Er ersetzt SPA, Elasticsearch und CGI-Proxy.</text>
+
+  <rect x="1180" y="559" width="9" height="9" fill="#0028A5"/>
+  <text x="1206" y="570" font-size="28" font-weight="600" fill="#121212">Den nächsten Fachfall starten</text>
+  <text x="1206" y="604" font-size="24" fill="#666666">Gleiches Template, neues Repo, gleiche Prüfungen.</text>
+
+  <rect x="1180" y="659" width="9" height="9" fill="#0028A5"/>
+  <text x="1206" y="670" font-size="28" font-weight="600" fill="#121212">appkit auf ein Release festziehen</text>
+  <text x="1206" y="704" font-size="24" fill="#666666">Heute folgt das Template dem main-Branch.</text>
+
+  <rect x="1180" y="759" width="9" height="9" fill="#0028A5"/>
+  <text x="1206" y="770" font-size="28" font-weight="600" fill="#121212">Fehlendes gehört in appkit</text>
+  <text x="1206" y="804" font-size="24" fill="#666666">Mit Fake und Test — so wächst die gemeinsame</text>
+  <text x="1206" y="836" font-size="24" fill="#666666">Basis, statt in jeder App eine eigene Lösung.</text>
+
+  <!-- Abschlussband -->
+  <rect x="0" y="908" width="1920" height="112" fill="#0028A5"/>
+  <text x="100" y="978" font-size="34" font-weight="600" fill="#FFFFFF">Die Fachseite bringt den Prozess. Das Template bringt Sicherheit, Barrierefreiheit und Wartbarkeit.</text>
+
+  <text x="100" y="1058" font-size="21" fill="#666666">Adate / Appkit — Pitch</text>
+  <text x="1820" y="1058" font-size="21" fill="#666666" text-anchor="end">6 / 6</text>
+</svg>

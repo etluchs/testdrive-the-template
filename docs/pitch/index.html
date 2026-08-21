@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adate / Appkit — Pitch</title>
+
+  <!-- reveal.js ist in reveal/ vendored (MIT, siehe reveal/LICENSE) — kein CDN,
+       damit das Deck auch ohne Netz läuft. -->
+  <link rel="stylesheet" href="reveal/reset.css">
+  <link rel="stylesheet" href="reveal/reveal.css">
+
+  <style>
+    /* Die Folien sind fertige 1920×1080-SVGs. reveal skaliert die Bühne, das
+       Bild füllt sie — deshalb braucht dieses Deck kein reveal-Theme. */
+    :root { color-scheme: light; }
+    html, body { background: #121212; }
+    .reveal .slides { text-align: left; }
+    .reveal .slides section {
+      padding: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reveal .slides section img.folie {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      margin: 0;
+      border: 0;
+      box-shadow: none;
+      background: #ffffff;
+    }
+    .reveal .progress { color: #0028A5; }
+    .reveal .controls { color: #0028A5; }
+    /* Beim Export nach PDF (?print-pdf) sollen die Folien randlos sitzen. */
+    @media print { html, body { background: #ffffff; } }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section>
+        <img class="folie" src="folie-1-worum-es-geht.svg"
+             alt="Folie 1: Interne Apps aus einem Bauplan. Der Servicekatalog bisher — SharePoint, Indexer, Elasticsearch, CGI-Proxy, SPA mit 440 KB — gegenüber SharePoint und dieser App: zwei bewegliche Teile statt fünf.">
+        <aside class="notes">
+          Einstieg über die beweglichen Teile: derselbe Katalog, aber SharePoint → App
+          statt fünf Stationen. Für die Fachseite heisst das «weniger, was kaputtgehen
+          kann», für die Entwicklung «weniger, was ich betreiben muss».
+        </aside>
+      </section>
+
+      <section>
+        <img class="folie" src="folie-2-fachnutzerinnen.svg"
+             alt="Folie 2: Für Fachnutzerinnen und Fachnutzer. Drei Spalten — was du erreichst, was du beiträgst, womit du arbeitest.">
+        <aside class="notes">
+          Die drei Spalten beantworten die drei Fragen der Fachseite. Wichtigster Satz
+          zum Vorlesen: «Kein Code, keine Architekturentscheide» — beigetragen werden
+          Fachwissen, eine Datenquelle und echte Beispiele.
+        </aside>
+      </section>
+
+      <section>
+        <img class="folie" src="folie-3-architektur.svg"
+             alt="Folie 3: Architektur. Das Template adate wird geklont, die Bibliothek appkit mit sharepoint, mail, auth, db und embeddings wird importiert; darunter die Plattform Azure Container Apps.">
+        <aside class="notes">
+          Der Unterschied zwischen geklont und importiert. Das Template ist ein
+          Startpunkt und danach eigenständig; appkit ist eine Abhängigkeit, die alle
+          Apps gemeinsam weiterziehen. Daraus folgt die Regel aus AGENTS.md:
+          Fehlendes gehört in appkit, mit Fake und Test.
+        </aside>
+      </section>
+
+      <section>
+        <img class="folie" src="folie-4-deployment.svg"
+             alt="Folie 4: Deployment. Aus dem Internet über das Application Gateway im Connectivity Hub, per VNet-Peering in zwei Landing Zones mit je einem Container Apps Environment für Test und Prod; darunter ein gemeinsames Azure-OpenAI-Deployment in einer eigenen Subscription.">
+        <aside class="notes">
+          Zwei Landing Zones, je eine eigene Subscription, je ein eigenes
+          Container Apps Environment — und ein einziger Eingang: das zentrale
+          Application Gateway. Das ist keine Stilfrage: die Landing Zone verbietet
+          öffentliche IP-Adressen per Policy. Wer hier zuhört und selbst deployen
+          will, merkt sich die beiden Pull Requests — Subnetze bei Subscription
+          Vending, Ingress bei Connectivity Management. Azure OpenAI steht bewusst
+          ausserhalb der beiden Zonen: eine eigene Subscription, von Test und Prod
+          gemeinsam genutzt, künftig der LLM-Proxy.
+        </aside>
+      </section>
+
+      <section>
+        <img class="folie" src="folie-5-entwicklerinnen.svg"
+             alt="Folie 4: Für Entwicklerinnen und Entwickler. Die drei AGENTS.md-Regeln links, was ruff, pytest und pa11y in der CI erzwingen rechts.">
+        <aside class="notes">
+          Hier geht es um die Sorge, am Ende fremden KI-Code zu warten. Die Antwort ist
+          kein Versprechen, sondern ein Mechanismus: AGENTS.md schreibt die Grenzen vor,
+          die CI lässt jede Überschreitung scheitern.
+        </aside>
+      </section>
+
+      <section>
+        <img class="folie" src="folie-6-beleg-und-naechste-schritte.svg"
+             alt="Folie 5: Validiert, nicht behauptet. Trefferquote der Suche 67 auf 83 Prozent an erster Stelle und 75 auf 100 Prozent unter den ersten drei, dazu die nächsten Schritte.">
+        <aside class="notes">
+          Die Trefferquoten stammen aus scripts/eval_search.py über alle 112
+          publizierten Services. Fairerweise dazusagen: die semantische Ebene läuft über
+          appkit.embeddings und braucht einen konfigurierten Azure-OpenAI-Endpunkt samt
+          Rollenzuweisung; ohne ihn gelten 67 % und 75 %.
+        </aside>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="reveal/reveal.js"></script>
+  <script src="reveal/plugin/notes.js"></script>
+  <script>
+    Reveal.initialize({
+      // Die Bühne hat exakt das Format der Folien, damit nichts beschnitten wird.
+      width: 1920,
+      height: 1080,
+      margin: 0,
+      controls: true,
+      progress: true,
+      hash: true,
+      slideNumber: false,   // die Folien tragen ihre Nummer selbst
+      transition: 'slide',
+      plugins: [RevealNotes],
+    });
+  </script>
+</body>
+</html>

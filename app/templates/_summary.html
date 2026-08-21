@@ -1,0 +1,10 @@
+{% from "_macros.html" import alert %}
+{% if error %}
+  {{ alert(error, kind="error", title="Could not send summary") }}
+{% else %}
+  {{ alert(
+      "A summary of %d requests was emailed to %s." | format(summary.total, recipient),
+      kind="success",
+      title="Summary sent"
+  ) }}
+{% endif %}

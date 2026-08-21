@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@v4
+
+      # appkit is the companion library, installed from its main branch. Uses
+      # the workflow token so it works for a private repo too. Pin `ref` to a
+      # tag once appkit publishes releases.
+      - name: Checkout appkit
+        uses: actions/checkout@v4
+        with:
+          repository: uzh-zi/appkit
+          ref: main
+          path: .appkit
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+
+      # setup-uv already provisions and activates a .venv (VIRTUAL_ENV is set),
+      # so install straight into it rather than creating another venv.
+      - name: Install appkit and app
+        run: |
+          uv pip install ./.appkit
+          uv pip install -e '.[dev]'
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Test
+        env:
+          APPKIT_BACKEND: fake
+          APPKIT_AUTH: dev
+        run: uv run pytest
+
+      - name: Setup Node (for pa11y)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Start example app
+        env:
+          APPKIT_BACKEND: fake
+          APPKIT_AUTH: dev
+        run: |
+          # Fully detach the server (own session, no inherited stdio) so the
+          # Actions runner doesn't adopt it as an orphan and hang at cleanup.
+          setsid uv run uvicorn app.main:app --host 127.0.0.1 --port 8080 \
+            > uvicorn.log 2>&1 < /dev/null &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8080/health && break
+            sleep 1
+          done
+
+      - name: Accessibility check (pa11y, WCAG 2.1 AA)
+        run: npx -y pa11y-ci --config .pa11yci.json
+
+      - name: Stop example app
+        if: always()
+        run: pkill -f "uvicorn app.main" || true

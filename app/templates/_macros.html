@@ -1,0 +1,132 @@
+{#
+  appkit UI macro library — WCAG 2.1 AA by construction.
+
+  Import in a template with:
+      {% from "_macros.html" import field, select, button, table, alert, nav %}
+
+  These macros are the ONLY sanctioned way to emit form and data markup in a
+  golden-path app. Hand-writing <input>, <table>, etc. is how labels, header
+  scopes, and focus states quietly go missing — so don't (see AGENTS.md).
+
+  Contracts (all forgiving of dicts or 2-tuples where a pair is expected):
+    columns / nav items / select options  ->  {"key"|"href"|"value": ..., "label": ...}
+    rows                                  ->  list of dicts keyed by column key
+  Extra keyword args passed to `field`, `select` and `button` are emitted as
+  attributes (underscores become dashes), so `hx_post="/x"` -> `hx-post="/x"`.
+#}
+
+{#-- text-like input with a real <label>, help text, and accessible errors --#}
+{% macro field(name, label, value="", type="text", required=false, help="", error="", placeholder="", autocomplete="") %}
+  {%- set ids = [] -%}
+  {%- if help %}{% set _ = ids.append(name ~ "-help") %}{% endif -%}
+  {%- if error %}{% set _ = ids.append(name ~ "-error") %}{% endif -%}
+  <div class="field{% if error %} field--error{% endif %}">
+    <label class="field__label" for="{{ name }}">
+      {{ label }}{% if required %} <span class="field__req" aria-hidden="true">*</span><span class="visually-hidden"> (required)</span>{% endif %}
+    </label>
+    {%- if help %}<p class="field__help" id="{{ name }}-help">{{ help }}</p>{% endif %}
+    <input class="field__input" id="{{ name }}" name="{{ name }}" type="{{ type }}"
+           value="{{ value }}"
+           {%- if placeholder %} placeholder="{{ placeholder }}"{% endif %}
+           {%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
+           {%- if required %} required aria-required="true"{% endif %}
+           {%- if error %} aria-invalid="true"{% endif %}
+           {%- if ids %} aria-describedby="{{ ids | join(' ') }}"{% endif %}
+           {%- for key, val in kwargs.items() %} {{ key | replace('_', '-') }}="{{ val }}"{% endfor %}>
+    {%- if error %}<p class="field__error" id="{{ name }}-error" role="alert">{{ error }}</p>{% endif %}
+  </div>
+{% endmacro %}
+
+{#-- labelled <select> --#}
+{% macro select(name, label, options, value="", required=false, help="", error="") %}
+  {%- set ids = [] -%}
+  {%- if help %}{% set _ = ids.append(name ~ "-help") %}{% endif -%}
+  {%- if error %}{% set _ = ids.append(name ~ "-error") %}{% endif -%}
+  <div class="field{% if error %} field--error{% endif %}">
+    <label class="field__label" for="{{ name }}">
+      {{ label }}{% if required %} <span class="field__req" aria-hidden="true">*</span><span class="visually-hidden"> (required)</span>{% endif %}
+    </label>
+    {%- if help %}<p class="field__help" id="{{ name }}-help">{{ help }}</p>{% endif %}
+    <select class="field__input" id="{{ name }}" name="{{ name }}"
+            {%- if required %} required aria-required="true"{% endif %}
+            {%- if error %} aria-invalid="true"{% endif %}
+            {%- if ids %} aria-describedby="{{ ids | join(' ') }}"{% endif %}
+            {%- for key, val in kwargs.items() %} {{ key | replace('_', '-') }}="{{ val }}"{% endfor %}>
+      {%- for opt in options %}
+        {%- set ovalue = opt.value if opt is mapping else opt[0] -%}
+        {%- set olabel = opt.label if opt is mapping else opt[1] -%}
+        <option value="{{ ovalue }}"{% if ovalue == value %} selected{% endif %}>{{ olabel }}</option>
+      {%- endfor %}
+    </select>
+    {%- if error %}<p class="field__error" id="{{ name }}-error" role="alert">{{ error }}</p>{% endif %}
+  </div>
+{% endmacro %}
+
+{#-- <button> with an accessible name from its content; extra kwargs pass through (hx_*) --#}
+{% macro button(label, type="button", variant="primary", name="", value="") %}
+  <button class="btn btn--{{ variant }}" type="{{ type }}"
+          {%- if name %} name="{{ name }}"{% endif %}
+          {%- if value %} value="{{ value }}"{% endif %}
+          {%- for key, val in kwargs.items() %} {{ key | replace('_', '-') }}="{{ val }}"{% endfor %}>{{ label }}</button>
+{% endmacro %}
+
+{#-- data table with <caption>, column scopes, and an optional row-header column --#}
+{% macro table(columns, rows, caption="", row_header="", empty="No rows to display.") %}
+  <div class="table__scroll" tabindex="0" role="region" aria-label="{{ caption or 'Data table' }}">
+    <table class="table">
+      {%- if caption %}<caption class="table__caption">{{ caption }}</caption>{% endif %}
+      <thead>
+        <tr>
+          {%- for col in columns %}
+            <th scope="col">{{ col.label if col is mapping else col[1] }}</th>
+          {%- endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {%- for row in rows %}
+          <tr>
+            {%- for col in columns %}
+              {%- set key = col.key if col is mapping else col[0] -%}
+              {%- if key == row_header %}
+                <th scope="row">{{ row.get(key, "") }}</th>
+              {%- else %}
+                <td>{{ row.get(key, "") }}</td>
+              {%- endif %}
+            {%- endfor %}
+          </tr>
+        {%- else %}
+          <tr><td class="table__empty" colspan="{{ columns | length }}">{{ empty }}</td></tr>
+        {%- endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endmacro %}
+
+{#-- status / error banner; meaning is carried by text, not colour alone --#}
+{% macro alert(message, kind="info", title="") %}
+  {%- set role = "alert" if kind in ("error", "warning") else "status" -%}
+  {%- set prefixes = {"success": "Success", "error": "Error", "warning": "Warning", "info": "Information"} -%}
+  <div class="alert alert--{{ kind }}" role="{{ role }}">
+    <span class="alert__icon" aria-hidden="true"></span>
+    <div class="alert__body">
+      <span class="visually-hidden">{{ prefixes.get(kind, "Notice") }}: </span>
+      {%- if title %}<p class="alert__title">{{ title }}</p>{% endif %}
+      <p class="alert__message">{{ message }}</p>
+    </div>
+  </div>
+{% endmacro %}
+
+{#-- primary navigation; marks the current page for assistive tech --#}
+{% macro nav(items, current="", label="Main") %}
+  <nav class="nav" aria-label="{{ label }}">
+    <ul class="nav__list">
+      {%- for item in items %}
+        {%- set href = item.href if item is mapping else item[0] -%}
+        {%- set text = item.label if item is mapping else item[1] -%}
+        <li class="nav__item">
+          <a class="nav__link" href="{{ href }}"{% if href == current %} aria-current="page"{% endif %}>{{ text }}</a>
+        </li>
+      {%- endfor %}
+    </ul>
+  </nav>
+{% endmacro %}

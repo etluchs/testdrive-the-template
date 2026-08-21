@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'Source Sans Pro','Source Sans 3','Helvetica Neue',Arial,Helvetica,sans-serif">
+  <title>Für Entwicklerinnen und Entwickler — Leitplanken statt Vertrauen</title>
+  <rect width="1920" height="1080" fill="#FFFFFF"/>
+  <rect x="0" y="0" width="1920" height="10" fill="#0028A5"/>
+
+  <text x="100" y="118" font-size="24" font-weight="600" letter-spacing="2.5" fill="#666666">FÜR ENTWICKLERINNEN UND ENTWICKLER</text>
+  <text x="100" y="212" font-size="68" font-weight="600" fill="#0028A5">Leitplanken statt Vertrauen</text>
+  <text x="100" y="276" font-size="31" fill="#121212">Was den Code klein und wartbar hält, steht nicht in einem Merkblatt — es scheitert in der CI.</text>
+
+  <!-- Links: die drei Regeln -->
+  <rect x="100" y="340" width="920" height="530" rx="10" fill="#F5F5FB"/>
+  <text x="140" y="402" font-size="23" font-weight="600" letter-spacing="2" fill="#0028A5">AGENTS.md — DIE DREI REGELN</text>
+
+  <text x="140" y="472" font-size="30" font-weight="600" fill="#121212">1 · Routen bleiben dünn</text>
+  <text x="140" y="510" font-size="25" fill="#121212">Request rein, logic.py rechnet, Template raus. Keine Schleifen,</text>
+  <text x="140" y="542" font-size="25" fill="#121212">keine Integrationen in der Route — Logik bleibt unit-testbar.</text>
+
+  <text x="140" y="612" font-size="30" font-weight="600" fill="#121212">2 · Keine rohen Integrationen</text>
+  <text x="140" y="650" font-size="25" fill="#121212">SharePoint, Mail, Datenbank und Auth laufen ausschliesslich über</text>
+  <text x="140" y="682" font-size="25" fill="#121212">appkit. Kein httpx, kein psycopg, keine Secrets im App-Code.</text>
+
+  <text x="140" y="752" font-size="30" font-weight="600" fill="#121212">3 · Kein handgeschriebenes Markup</text>
+  <text x="140" y="790" font-size="25" fill="#121212">Formulare, Tabellen und Meldungen nur über die Jinja-Makros —</text>
+  <text x="140" y="822" font-size="25" fill="#121212">barrierefrei by construction, statt bei jedem Feld neu erinnert.</text>
+
+  <!-- Rechts: was die CI erzwingt -->
+  <rect x="1080" y="340" width="740" height="530" rx="10" fill="#FFFFFF" stroke="#E9E9E9" stroke-width="2"/>
+  <text x="1120" y="402" font-size="23" font-weight="600" letter-spacing="2" fill="#0028A5">WAS DIE CI ERZWINGT</text>
+
+  <rect x="1120" y="452" width="9" height="9" fill="#0028A5"/>
+  <text x="1146" y="463" font-size="27" font-weight="600" fill="#121212">ruff</text>
+  <text x="1146" y="497" font-size="24" fill="#666666">Lint und Import-Ordnung, bei jedem Push</text>
+
+  <rect x="1120" y="552" width="9" height="9" fill="#0028A5"/>
+  <text x="1146" y="563" font-size="27" font-weight="600" fill="#121212">pytest</text>
+  <text x="1146" y="597" font-size="24" fill="#666666">Unit und Integration auf Fake-Backend —</text>
+  <text x="1146" y="629" font-size="24" fill="#666666">ohne Azure, ohne Netz, in Sekunden</text>
+
+  <rect x="1120" y="684" width="9" height="9" fill="#0028A5"/>
+  <text x="1146" y="695" font-size="27" font-weight="600" fill="#121212">pa11y</text>
+  <text x="1146" y="729" font-size="24" fill="#666666">WCAG 2.1 AA gegen die laufende App</text>
+
+  <rect x="1120" y="784" width="9" height="9" fill="#0028A5"/>
+  <text x="1146" y="795" font-size="27" font-weight="600" fill="#121212">Konfiguration, die laut scheitert</text>
+  <text x="1146" y="829" font-size="24" fill="#666666">appkit erzwingt Backend und Auth-Modus,</text>
+  <text x="1146" y="861" font-size="24" fill="#666666">statt sie still falsch zu raten</text>
+
+  <!-- Beleg-Band -->
+  <rect x="0" y="906" width="1920" height="112" fill="#F5F5FB"/>
+  <g>
+    <text x="100" y="960" font-size="40" font-weight="600" fill="#0028A5">106 Tests</text>
+    <text x="100" y="992" font-size="22" fill="#666666">im Servicekatalog-Build</text>
+
+    <text x="580" y="960" font-size="40" font-weight="600" fill="#0028A5">rund 1570 Zeilen</text>
+    <text x="580" y="992" font-size="22" fill="#666666">Python für die ganze Anwendung</text>
+
+    <text x="1160" y="960" font-size="40" font-weight="600" fill="#0028A5">112 von 187</text>
+    <text x="1160" y="992" font-size="22" fill="#666666">publizierte Einträge — die Zahl ist per Test gepinnt</text>
+  </g>
+
+  <text x="100" y="1058" font-size="21" fill="#666666">Adate / Appkit — Pitch</text>
+  <text x="1820" y="1058" font-size="21" fill="#666666" text-anchor="end">5 / 6</text>
+</svg>
